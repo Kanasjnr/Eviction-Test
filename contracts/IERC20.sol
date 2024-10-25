@@ -21,5 +21,4 @@ interface IERC20 {
     ) external view returns (uint256);
 
     function approve(address spender, uint256 value) external returns (bool);
-    
 }

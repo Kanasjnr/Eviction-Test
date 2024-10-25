@@ -24,7 +24,24 @@ async function main() {
   await tokenVesting.waitForDeployment();
   console.log("TokenVesting deployed to:", tokenVesting.target);
 
+  // ********** Mint Tokens ****
+
+  const mintAmount = ethers.parseEther("1000000"); 
+  console.log("Minting", ethers.formatEther(mintAmount), "KAN tokens");
+
   
+  const mintTx = await token.connect(deployer).mint(deployer.address, mintAmount);
+  await mintTx.wait();
+  console.log("Tokens minted successfully");
+
+ // ********** Transfer Tokens to Vesting Contract ****
+
+ const transferAmount = ethers.parseEther("100000"); 
+ console.log("Transferring", ethers.formatEther(transferAmount), "KAN tokens to vesting contract");
+
+ const transferTx = await token.transfer(tokenVesting.target, transferAmount);
+ await transferTx.wait();
+ console.log("Tokens transferred to vesting contract successfully");
 
   // ********** Add Beneficiary ****
 
@@ -46,9 +63,9 @@ async function main() {
 
   // ********** Adding More Time ****
 
-  const timeAded = startTime + duration;
+  const timeAdded = startTime + duration;
 
-  await time.increaseTo(timeAded);
+  await time.increaseTo(timeAdded);
 
   console.log("Time Added successfully");
 
@@ -59,12 +76,15 @@ async function main() {
   await claimTx.wait();
   console.log("Vested tokens claimed successfully");
 
-
   // ####### Checking beneficiaryBalance #####
-
 
   const beneficiaryBalance = await token.balanceOf(beneficiary.address);
   console.log("Beneficiary's token balance:", ethers.formatEther(beneficiaryBalance), "KAN");
+
+  // ####### Checking Vesting Contract Balance #####
+
+  const vestingContractBalance = await token.balanceOf(tokenVesting.target);
+  console.log("Vesting contract's token balance:", ethers.formatEther(vestingContractBalance), "KAN");
 }
 
 main()
